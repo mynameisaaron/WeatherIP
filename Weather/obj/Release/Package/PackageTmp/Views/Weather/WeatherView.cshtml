@@ -1,0 +1,154 @@
+﻿@model Weather.ViewModels.WeatherAppViewModel
+@{
+    ViewBag.Title = "Home Page";
+}
+
+
+
+<div id="weather">
+    <div class="image">
+        <img id="image" src="@Model.ImageUrl" />
+        <p style="font-size: .7em">images from Flickr</p>
+    </div>
+
+
+    <p>According to your IP address you are in @Model.IpLocationObject.City in the great state of @Model.IpLocationObject.Region</p>
+
+    <ul>
+        <li>The curent temperature is <span style="text-decoration:underline"></span></li>
+        @if (Model.WeatherObject.percip_in > 0)
+        {
+            <li>Today's Percipication @Model.WeatherObject.percip_in inches percipitation</li>
+        }
+
+        <li>As you can see from the picture the sky is @Model.WeatherObject.weather</li>
+    </ul>
+
+</div>
+
+
+
+
+
+<link href="https://fonts.googleapis.com/css?family=Raleway|Sansita" rel="stylesheet">
+
+
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+
+            $span = $("span");
+            var onF = true;
+            var F = "@Model.WeatherObject.temp_f°F";
+            var C = "@Model.WeatherObject.temp_c°C";
+
+            $span.append(F);
+
+            $span.on("click", function () {
+
+                if (onF) {
+                    $span.empty().append(C);
+                    onF = false;
+                }
+                else {
+                    $span.empty().append(F);
+                    onF = true;
+                }
+
+
+
+
+            });
+
+        });
+    </script>
+    <style>
+        p, ul {
+            font-family: 'Raleway', sans-serif;
+        }
+
+        .image p {
+            font-family: 'Sansita', sans-serif;
+        }
+
+
+        #weather {
+            margin: 25px auto 0px auto;
+            text-align: center;
+            padding-top: 35px;
+            padding-bottom: 35px;
+            border-radius: 10px 10px 10px 10px;
+            -moz-border-radius: 10px 10px 10px 10px;
+            -webkit-border-radius: 10px 10px 10px 10px;
+            border: 0px solid #000000;
+            -webkit-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.75);
+            -moz-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.75);
+            box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.75);
+            width: 700px;
+            max-width: 85%;
+            animation:Yllw 3s;
+            animation-fill-mode: forwards;
+            
+            
+
+            
+        }
+
+        @@keyframes Yllw {
+
+
+            0% {
+                background-color: hsla(360, 100%, 62%, 0);
+            }
+
+            25% {
+                background-color: hsla(260, 100%, 62%, 0.33);
+            }
+
+            75% {
+                background-color: hsla(160, 100%, 62%, 0.66);
+            }
+
+            100% {
+                background-color: hsla(58, 100%, 62%, 1);
+            }
+        }
+        @@keyframes Notyllw {
+
+
+            0% {
+                background-color: hsla(360, 100%, 62%, 0);
+            }
+
+            25% {
+                background-color: hsla(312, 77%, 62%, 0.33);
+            }
+
+            75% {
+                background-color: hsla(264, 54%, 62%, 0.66);
+            }
+
+            100% {
+                background-color: hsla(216, 30%, 62%, .97);
+            }
+        }
+
+        #image {
+            max-width: 90%;
+            border-radius: 4px 20px 4px 20px;
+            -moz-border-radius: 4px 20px 4px 20px;
+            -webkit-border-radius: 4px 20px 4px 20px;
+            border: 0px solid #000000;
+        }
+
+        ul {
+            text-align: left;
+            list-style: none;
+            margin-left: 20%;
+            max-width: 90%;
+        }
+    </style>
+}
+
+
