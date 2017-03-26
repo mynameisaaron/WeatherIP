@@ -1,4 +1,5 @@
-﻿@model Weather.ViewModels.WeatherAppViewModel
+﻿@using WebGrease.Css.Ast.MediaQuery
+@model Weather.ViewModels.WeatherAppViewModel
 @{
     ViewBag.Title = "Home Page";
 }
@@ -89,6 +90,7 @@
             max-width: 85%;
             animation:Yllw 3s;
             animation-fill-mode: forwards;
+            animation-iteration-count:infinite;
             
             
 
@@ -114,25 +116,7 @@
                 background-color: hsla(58, 100%, 62%, 1);
             }
         }
-        @@keyframes Notyllw {
-
-
-            0% {
-                background-color: hsla(360, 100%, 62%, 0);
-            }
-
-            25% {
-                background-color: hsla(312, 77%, 62%, 0.33);
-            }
-
-            75% {
-                background-color: hsla(264, 54%, 62%, 0.66);
-            }
-
-            100% {
-                background-color: hsla(216, 30%, 62%, .97);
-            }
-        }
+       
 
         #image {
             max-width: 90%;
@@ -147,6 +131,11 @@
             list-style: none;
             margin-left: 20%;
             max-width: 90%;
+        }
+
+
+        @@media(max-width: 615px) {
+            ul{margin-left: 10%}
         }
     </style>
 }

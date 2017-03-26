@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
-using Newtonsoft.Json;
 using Weather.Models;
 using Weather.ViewModels;
 
@@ -13,6 +11,16 @@ namespace Weather.Controllers
 {
     public class WeatherController : Controller
     {
+
+        long IpStringIn(string ip)
+        {
+
+           var nodot = ip.Replace(".", string.Empty);
+            return Convert.ToInt64(nodot);
+
+        }
+        
+
         // GET: Weather
         public ActionResult Index()
         {
@@ -21,17 +29,17 @@ namespace Weather.Controllers
 
         public ActionResult WeatherView()
         {
-            ////////////////
+            
             /// Geting the users IP Address
 
             var ipaddress = Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
             if (string.IsNullOrEmpty(ipaddress))
                 ipaddress = Request.ServerVariables["REMOTE_ADDR"];
 
-            ///////////////
             /// Getting the location object
-            /// 
-            /// 
+            
+            if (ipaddress == "::1")
+                ipaddress = "68.42.195.179";
             string responseFromServer_Location;
             WebRequest request = WebRequest.Create("http://ipinfo.io/" + ipaddress + "/geo");
             WebResponse response = request.GetResponse();
@@ -41,24 +49,26 @@ namespace Weather.Controllers
             {
                 responseFromServer_Location = reader.ReadToEnd();
             }
+            
+            dynamic ipLocationObjectDynamic = JsonConvert.DeserializeObject<dynamic>(responseFromServer_Location);
+            var ipLocationObject = new IpLocationObject()
+            {
+                City = ipLocationObjectDynamic.city,
+                Ip = IpStringIn(ipaddress),
+                Country = ipLocationObjectDynamic.country,
+                Postal = ipLocationObjectDynamic.postal,
+                Region = ipLocationObjectDynamic.region
 
+            };
 
-
-
-            //////////////////
-            /// deserialize the JSon Object into peices oject 
-            /// 
-
-
-            var ipLocationObject = new IpLocationObject();
-
-            ipLocationObject = JsonConvert.DeserializeObject<IpLocationObject>(responseFromServer_Location);
-
-
-
+            
+            if (ipLocationObject.Country.ToLower() != "us")
+            {
+                return View("SorryView", ipLocationObject);
+            }
+            
             ////use the ipLocation to get weather object from api using zipcode!
-            /// 
-            /// 
+            
             string responseFromServer_Weather;
             
             WebRequest _request = WebRequest.Create("http://api.wunderground.com/api/9b16b668f3b79445/conditions/q/" + ipLocationObject.Postal + ".json");
@@ -70,19 +80,16 @@ namespace Weather.Controllers
             }
 
             var weatherobject = new WeatherObject();
-
-
-
+            
             dynamic rslts = JsonConvert.DeserializeObject<dynamic>(responseFromServer_Weather);
             weatherobject.temp_f = rslts.current_observation.temp_f;
             weatherobject.temp_c = rslts.current_observation.temp_c;
             weatherobject.percip_in = rslts.current_observation.precip_today_in;
             weatherobject.weather = rslts.current_observation.icon.ToString();
 
-            // partly
+            
             string testForPartly = new string(weatherobject.weather.Take(6).ToArray());
-
-
+            
             if (testForPartly == "partly")
             {
                 var wo = weatherobject.weather.Skip(6);
@@ -90,14 +97,8 @@ namespace Weather.Controllers
                 weatherobject.weather = WeatherObject;
 
             }
+            
 
-
-            /////////////////////////////////
-
-
-            //THE WEATHER API IS RETURNING 'MOSTLY CLOUDY' NEEDS TO BE ONE STRING WITH NO SPACES TO FEED TO THE FLICKER API!//
-
-            ///////////////////////////////////////////////////////////////////////////////
             string responseFromServer_Image;
 
             WebRequest image_request = WebRequest.Create("https://api.flickr.com/services/feeds/photos_public.gne?format=json&tags=beach,weather," + weatherobject.weather);
@@ -110,24 +111,17 @@ namespace Weather.Controllers
 
             var responseFromServer_Image_json_Array = responseFromServer_Image.Reverse().Skip(1).Reverse().Skip(15).ToArray();
             var responseFromServer_Image_Json_Formatted = new string(responseFromServer_Image_json_Array);
-
-
+            
 
             dynamic image_rslts = JsonConvert.DeserializeObject<dynamic>(responseFromServer_Image_Json_Formatted);
-
-
-
-
-
+            
 
             Random random = new Random();
-            var randomNumber = random.Next(0, 10);
+            var randomNumber = random.Next(0, 5);
 
             string image = image_rslts.items[randomNumber].media.m;
-            string imageA = image_rslts.items[randomNumber].media.m;
+            
 
-
-            /////////////////////////////////////////////////////////////////////
             var weatherAppViewModel = new WeatherAppViewModel()
             {
                 WeatherObject = weatherobject,
@@ -135,13 +129,7 @@ namespace Weather.Controllers
                 ImageUrl = image
 
             };
-
-
-
-
-
-
-
+            
             return View(weatherAppViewModel);
 
         }

@@ -66,3 +66,4 @@ c:\users\aaron selonke\documents\visual studio 2015\Projects\Weather\Weather\bin
 c:\users\aaron selonke\documents\visual studio 2015\Projects\Weather\Weather\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
 c:\users\aaron selonke\documents\visual studio 2015\Projects\Weather\Weather\obj\Release\Weather.dll
 c:\users\aaron selonke\documents\visual studio 2015\Projects\Weather\Weather\obj\Release\Weather.pdb
+C:\Users\Aaron Selonke\Documents\Visual Studio 2015\Projects\Weather\Weather\obj\Release\Weather.csprojResolveAssemblyReference.cache
